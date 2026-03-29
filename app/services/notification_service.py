@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from app.models.notification import Notification
+from app.tasks.notification_tasks import send_notification_task
 
 
-def create_notification(db: Session, data):
+def create_notification(db, data):
     notification = Notification(
         channel=data.channel,
         recipient=data.recipient,
@@ -12,5 +13,7 @@ def create_notification(db: Session, data):
     db.add(notification)
     db.commit()
     db.refresh(notification)
+
+    send_notification_task.delay(notification.id)
 
     return notification

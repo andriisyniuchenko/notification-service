@@ -12,6 +12,7 @@ services:
       - .env
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:15
@@ -22,3 +23,21 @@ services:
       POSTGRES_DB: notifications
     ports:
       - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: notification_redis
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    container_name: notification_worker
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
