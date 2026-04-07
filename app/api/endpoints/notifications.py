@@ -1,11 +1,18 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.schemas.notification import NotificationCreate, NotificationResponse
-from app.services.notification_service import create_notification
+from app.services.notification_service import create_notification, get_notifications
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
+
+
+@router.get("/", response_model=List[NotificationResponse])
+def list_notifications(db: Session = Depends(get_db)):
+    return get_notifications(db)
 
 
 @router.post("/", response_model=NotificationResponse)
