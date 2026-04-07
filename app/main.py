@@ -1,5 +1,7 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from app.api.endpoints.notifications import router as notification_router
+from app.api.endpoints.ui import router as ui_router
 from app.db.init_db import init_db
 
 app = FastAPI(title="Notification Service")
@@ -11,8 +13,9 @@ def on_startup():
 
 
 app.include_router(notification_router)
+app.include_router(ui_router)
 
 
 @app.get("/")
 async def root():
-    return {"status": "OK"}
+    return RedirectResponse(url="/ui/")

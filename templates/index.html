@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="3">
+    <title>Notification Service</title>
+    <style>
+        body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+        h1 { font-size: 1.4rem; margin-bottom: 24px; }
+        h2 { font-size: 1rem; margin-bottom: 12px; color: #555; }
+
+        form { background: #fff; padding: 20px; border-radius: 6px; margin-bottom: 32px; }
+        select, input, textarea { width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 10px; font-family: monospace; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 20px; background: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-family: monospace; }
+        button:hover { background: #555; }
+
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        th { background: #333; color: #fff; }
+        tr:last-child td { border-bottom: none; }
+
+        .status-pending  { color: #e6a817; font-weight: bold; }
+        .status-sent     { color: #2e7d32; font-weight: bold; }
+        .status-failed   { color: #c62828; font-weight: bold; }
+        .status-retrying { color: #1565c0; font-weight: bold; }
+
+        .empty { text-align: center; padding: 24px; color: #999; }
+    </style>
+</head>
+<body>
+    <h1>Notification Service</h1>
+
+    <h2>Send notification</h2>
+    <form method="post" action="/ui/send">
+        <select name="channel">
+            <option value="email">email</option>
+            <option value="sms">sms</option>
+            <option value="push">push</option>
+        </select>
+        <input type="text" name="recipient" placeholder="Recipient (email / phone / token)" required>
+        <textarea name="content" rows="3" placeholder="Message content" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+
+    <h2>Notifications <small style="color:#999">(auto-refresh every 3s)</small></h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Channel</th>
+                <th>Recipient</th>
+                <th>Content</th>
+                <th>Status</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if notifications %}
+                {% for n in notifications %}
+                <tr>
+                    <td>{{ n.id }}</td>
+                    <td>{{ n.channel }}</td>
+                    <td>{{ n.recipient }}</td>
+                    <td>{{ n.content }}</td>
+                    <td class="status-{{ n.status }}">{{ n.status }}</td>
+                    <td>{{ n.created_at.strftime('%H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="6" class="empty">No notifications yet</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</body>
+</html>
