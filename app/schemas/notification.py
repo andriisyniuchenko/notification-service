@@ -1,10 +1,17 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
 
 
+class Channel(str, Enum):
+    email = "email"
+    sms = "sms"
+    push = "push"
+
+
 class NotificationCreate(BaseModel):
-    channel: str
+    channel: Channel
     recipient: str
     content: str
 
