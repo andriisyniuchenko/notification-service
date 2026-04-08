@@ -68,11 +68,16 @@ def send_notification_task(self, notification_id: int) -> None:
         logger.info("Notification id=%d marked as sent", notification_id)
 
     except Exception as exc:
+        retries_left = self.max_retries - self.request.retries - 1
         logger.warning(
             "Failed to send notification id=%d: %s. Retries left: %d",
             notification_id,
             exc,
-            self.max_retries - self.request.retries,
+            retries_left,
         )
-        _update_status(notification_id, "failed")
-        raise self.retry(exc=exc)
+        if retries_left > 0:
+            _update_status(notification_id, "retrying")
+            raise self.retry(exc=exc)
+        else:
+            _update_status(notification_id, "failed")
+            raise
